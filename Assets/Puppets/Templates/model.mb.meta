@@ -1,0 +1,149 @@
+fileFormatVersion: 2
+guid: c265aff6bd6e8b248914e9ede7f41e11
+timeCreated: 1449372695
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Accessory_01
+    100002: Accessory_02
+    100004: Arm_lower_left
+    100006: Arm_lower_right
+    100008: Arm_upper_left
+    100010: Arm_upper_right
+    100012: Foot_left
+    100014: Foot_right
+    100016: Head
+    100018: Leg_lower_left
+    100020: Leg_lower_right
+    100022: Leg_upper_left
+    100024: Leg_upper_right
+    100026: //RootNode
+    100028: Torso_lower
+    100030: Torso_upper
+    400000: Accessory_01
+    400002: Accessory_02
+    400004: Arm_lower_left
+    400006: Arm_lower_right
+    400008: Arm_upper_left
+    400010: Arm_upper_right
+    400012: Foot_left
+    400014: Foot_right
+    400016: Head
+    400018: Leg_lower_left
+    400020: Leg_lower_right
+    400022: Leg_upper_left
+    400024: Leg_upper_right
+    400026: //RootNode
+    400028: Torso_lower
+    400030: Torso_upper
+    2300000: Accessory_01
+    2300002: Accessory_02
+    2300004: Arm_lower_left
+    2300006: Arm_lower_right
+    2300008: Arm_upper_left
+    2300010: Arm_upper_right
+    2300012: Foot_left
+    2300014: Foot_right
+    2300016: Head
+    2300018: Leg_lower_left
+    2300020: Leg_lower_right
+    2300022: Leg_upper_left
+    2300024: Leg_upper_right
+    2300026: Torso_lower
+    2300028: Torso_upper
+    3300000: Accessory_01
+    3300002: Accessory_02
+    3300004: Arm_lower_left
+    3300006: Arm_lower_right
+    3300008: Arm_upper_left
+    3300010: Arm_upper_right
+    3300012: Foot_left
+    3300014: Foot_right
+    3300016: Head
+    3300018: Leg_lower_left
+    3300020: Leg_lower_right
+    3300022: Leg_upper_left
+    3300024: Leg_upper_right
+    3300026: Torso_lower
+    3300028: Torso_upper
+    4300000: Head
+    4300002: Torso_upper
+    4300004: Torso_lower
+    4300006: Arm_upper_left
+    4300008: Leg_upper_left
+    4300010: Leg_lower_left
+    4300012: Foot_left
+    4300014: Arm_lower_left
+    4300016: Accessory_01
+    4300018: Accessory_02
+    4300020: Arm_upper_right
+    4300022: Arm_lower_right
+    4300024: Leg_upper_right
+    4300026: Leg_lower_right
+    4300028: Foot_right
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
