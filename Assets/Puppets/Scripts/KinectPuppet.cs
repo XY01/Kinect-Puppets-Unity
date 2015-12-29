@@ -1,6 +1,56 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[System.Serializable]
+public class KinectPuppetProfile
+{
+    public string   m_Name;
+    public int[]    m_PartIndecies = new int[System.Enum.GetNames(typeof(KinectPuppet_Manager.BodyPartType)).Length];
+
+    public KinectPuppetProfile()
+    {
+        m_Name = "Default Puppet";
+        for (int i = 0; i < m_PartIndecies.Length; i++)
+        {
+            m_PartIndecies[i] = 0;
+        }
+
+        Save();
+    }
+
+    public KinectPuppetProfile( string name )
+    {
+        m_Name = name;
+        Load();
+    }
+
+    public void Load( string name )
+    {
+        m_Name = name;
+        Load();
+    }
+
+    public void Load()
+    {
+        for (int i = 0; i < m_PartIndecies.Length; i++)
+        {
+            m_PartIndecies[i] = PlayerPrefs.GetInt(m_Name + ".LimbIndex" + i);
+        }
+
+        Save();
+    }
+
+    public void Save( )
+    {
+        Debug.Log("Saving: " + m_Name);
+        for (int i = 0; i < m_PartIndecies.Length; i++)
+        {
+            Debug.Log("Saving limb index: " + m_PartIndecies[i] );
+            PlayerPrefs.SetInt(m_Name + ".LimbIndex" + i, m_PartIndecies[i]);                     
+        }
+    }
+}
+
 public class KinectPuppet : MonoBehaviour
 {
     Transform[] m_Pivots;
@@ -28,12 +78,18 @@ public class KinectPuppet : MonoBehaviour
     // Array of body parts
     public BodyPart[] m_PuppetParts;
 
+    public KinectPuppetProfile m_Profile;
+
     public bool m_UseAccessory1 = false;
     public bool m_UseAccessory2 = false;
 
 	// Use this for initialization
-	void Start ()
+	public void Initialize ( KinectPuppetProfile prof )
     {
+        m_Profile = prof;
+
+        m_PuppetParts = new BodyPart[KinectPuppet_Manager.Instance.m_BodyParts.Length];
+        
         Spawn();
 	}
 	
@@ -58,46 +114,49 @@ public class KinectPuppet : MonoBehaviour
             if (KinectPuppet_Manager.Instance.m_BodyParts[i].m_Parts == null || KinectPuppet_Manager.Instance.m_BodyParts[i].m_Parts.Length == 0)
                 continue;
 
-            BodyPart part = Instantiate(KinectPuppet_Manager.Instance.m_BodyParts[i].m_Parts[0]) as BodyPart;
+           
+            BodyPart part = Instantiate(KinectPuppet_Manager.Instance.m_BodyParts[i].m_Parts[m_Profile.m_PartIndecies[i]]) as BodyPart;
+            part.m_Puppet = this;
             m_PuppetParts[i] = part;
 
             part.transform.SetParent(transform);
         }
     }
 
-
-    void Save( string name )
+   
+    public void SaveProfile( )
     {
-        for (int i = 0; i < m_PuppetParts.Length; i++)
-        {
-            if (m_PuppetParts[i] == null)
-                PlayerPrefs.SetInt(name + ".LimbIndex" + i, 99);
-            else
-            {
-                int index = 0;
-                int.TryParse(m_PuppetParts[i].name, out index);
-                PlayerPrefs.SetInt(name + ".LimbIndex" + i, index);
-            }
-        }
+        m_Profile.Save();
     }
 
-    void Load( string name )
+    public void LoadProfile( KinectPuppetProfile profile )
     {
+        print("LOADING: " + profile.m_Name );
+
+        m_Profile = profile;
+        m_Profile.Load();       
+
         for (int i = 0; i < m_PuppetParts.Length; i++)
         {
-            int index = PlayerPrefs.GetInt(name + ".LimbIndex" + i);
+            int index = m_Profile.m_PartIndecies[i];
 
             if( index != 99 )
             {
                 if (m_PuppetParts[i] != null)
                     Destroy(m_PuppetParts[i].gameObject);
 
+                if (index >= KinectPuppet_Manager.Instance.m_BodyParts[i].m_Parts.Length)
+                    continue;
+
                 BodyPart part = Instantiate(KinectPuppet_Manager.Instance.m_BodyParts[i].m_Parts[index]) as BodyPart;
                 m_PuppetParts[i] = part;
+                part.m_Puppet = this;
 
                 part.transform.SetParent(transform);
             }
         }
+
+        print("Loaded: " + profile.m_Name);
     }
 
     public void NextPart( BodyPart part )
@@ -105,16 +164,19 @@ public class KinectPuppet : MonoBehaviour
         KinectPuppet_Manager.BodyPartType type = part.m_BodyPart;
         int typeIndex = (int)type;
 
-        int partIndex = 0;
+        int partIndex = m_Profile.m_PartIndecies[typeIndex];
         int.TryParse("" + (part.name[0]), out partIndex);
         partIndex++;
 
         if ( partIndex >= KinectPuppet_Manager.Instance.m_BodyParts[typeIndex].m_Parts.Length )
             partIndex = 0;
 
+        m_Profile.m_PartIndecies[typeIndex] = partIndex;
+
         Destroy(part.gameObject);
 
         BodyPart newPart = Instantiate(KinectPuppet_Manager.Instance.m_BodyParts[typeIndex].m_Parts[partIndex]) as BodyPart;
+        newPart.m_Puppet = this;
         m_PuppetParts[typeIndex] = newPart;
 
         newPart.transform.SetParent(transform);
@@ -123,6 +185,32 @@ public class KinectPuppet : MonoBehaviour
 
         print("Changing parts " + typeIndex + "    " + partIndex);
     }
+
+    public void PrevPart(BodyPart part)
+    {
+        KinectPuppet_Manager.BodyPartType type = part.m_BodyPart;
+        int typeIndex = (int)type;
+
+        int partIndex = 0;
+        int.TryParse("" + (part.name[0]), out partIndex);
+        partIndex--;
+
+        if (partIndex < 0)
+            partIndex = KinectPuppet_Manager.Instance.m_BodyParts[typeIndex].m_Parts.Length - 1;
+
+        Destroy(part.gameObject);
+
+        BodyPart newPart = Instantiate(KinectPuppet_Manager.Instance.m_BodyParts[typeIndex].m_Parts[partIndex]) as BodyPart;
+        newPart.m_Puppet = this;
+        m_PuppetParts[typeIndex] = newPart;
+
+        newPart.transform.SetParent(transform);
+
+        KinectPuppet_Manager.Instance.SetSelectedBodyPart(newPart);
+
+        print("Changing parts " + typeIndex + "    " + partIndex);
+    }
+    
 
     /*
     void OnDrawGizmos()

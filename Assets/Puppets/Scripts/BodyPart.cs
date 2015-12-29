@@ -5,6 +5,8 @@ using System.Collections;
 // 
 public class BodyPart : MonoBehaviour
 {
+    public KinectPuppet m_Puppet;
+
     Transform m_BasePivot; //transform
     public Transform m_EndPivot; //transform
     public Transform m_LeftPivot; //transform

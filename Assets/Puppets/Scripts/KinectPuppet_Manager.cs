@@ -67,9 +67,14 @@ public class KinectPuppet_Manager : MonoBehaviour
     //public BodyPart[] m_PuppetParts;
 
     public BodyPart m_SelectedBodyPart;
-    List< KinectPuppet > m_Puppets = new List<KinectPuppet>();
+    public KinectPuppet[] m_Puppets = new KinectPuppet[2];
+
+
+    public List<KinectPuppetProfile> m_PuppetProfiles = new List<KinectPuppetProfile>();
 
     List<string> m_SavedPuppetNames = new List<string>();
+
+    public KinectPuppet_GUI m_GUI;
 
     void Awake()
     {
@@ -79,8 +84,8 @@ public class KinectPuppet_Manager : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        // Load body parts from resources
         m_BodyParts = new BodyPartsArray[System.Enum.GetNames(typeof(BodyPartType)).Length];
-
         for (int i = 0; i < m_BodyParts.Length; i++)
         {
             BodyPartsArray newParts = new BodyPartsArray();
@@ -89,58 +94,131 @@ public class KinectPuppet_Manager : MonoBehaviour
 
             m_BodyParts[i] = newParts;
         }
+               
 
-        CreatePuppet();
+        // Load profiles
+        LoadProfiles();
+
+        // If no profiles loaded then create a default profile
+        if (m_PuppetProfiles.Count == 0)
+        {
+            print("Creating default profile");
+            CreateNewProfile("Default puppet", false);
+        }
+
+        //Create puppets
+        m_Puppets = new KinectPuppet[2];
+        for (int i = 0; i < 2; i++)
+        {
+            KinectPuppet puppet = new GameObject("Puppet " + i).AddComponent<KinectPuppet>();
+            m_Puppets[i] = puppet;
+            m_Puppets[i].Initialize(m_PuppetProfiles[0]);
+        }
+
+        // Turn second puppet off
+        m_Puppets[1].gameObject.SetActive(false);
+
+
+        m_GUI.Init( m_PuppetProfiles );
 
        //Spawn();
 	}
 
-    void Save()
+
+    public void CreateNewProfile(string name)
     {
-        PlayerPrefs.SetInt("m_SavedPuppetNames.Count", m_SavedPuppetNames.Count);
-        for (int i = 0; i < m_SavedPuppetNames.Count; i++)
-        {
-            PlayerPrefs.SetString("Name" + i, m_SavedPuppetNames[i]);
-        }
+        CreateNewProfile(name, true);
+
     }
 
-    void Load()
+    void CreateNewProfile(string name, bool loadToPuppet )
     {
-        int count = PlayerPrefs.GetInt("m_SavedPuppetNames.Count");
-        for (int i = 0; i < count; i++)
-        {
-           m_SavedPuppetNames.Add( PlayerPrefs.GetString("Name" + i) );
-        }
-    }
-
-    public void CreatePuppet()
-    {
-        if (m_Puppets.Count >= 2)
+        print("Creating profile: " + name);
+        if (name == "")
             return;
 
-        KinectPuppet puppet = new GameObject("Puppet " + m_Puppets.Count).AddComponent < KinectPuppet >();
-        m_Puppets.Add(puppet);
+        bool alreadyExists = false;
+
+        foreach (KinectPuppetProfile p in m_PuppetProfiles)
+            if (p.m_Name == name)
+                alreadyExists = true;
+
+        if (!alreadyExists)
+        {
+            KinectPuppetProfile profile = new KinectPuppetProfile(name);
+            m_PuppetProfiles.Add(profile);
+
+            if (loadToPuppet)
+                m_Puppets[0].LoadProfile(profile);
+        }
+
+        m_GUI.UpdateProfileList(m_PuppetProfiles);
     }
 
-    public void RemovePuppet( KinectPuppet puppet )
+    string SaveCount = "ProfileNamesCount";
+    string SaveNames = "ProfileNames";
+    // Save / Load
+    void SaveProfiles()
     {
-        m_Puppets.Remove(puppet);
-        Destroy(puppet);
+        print("Saved puppets:");
+        PlayerPrefs.SetInt(SaveCount, m_PuppetProfiles.Count);
+        for (int i = 0; i < m_PuppetProfiles.Count; i++)
+        {
+            PlayerPrefs.SetString(SaveNames + i, m_PuppetProfiles[i].m_Name);
+            print("--  " + m_PuppetProfiles[i]);
+        }
+
+        print("Save ended.");
+    }
+
+    void SaveCurrentProfile()
+    {
+        m_Puppets[0].SaveProfile();
+    }
+
+    void LoadProfiles()
+    {
+        int count = PlayerPrefs.GetInt(SaveCount);
+
+         print("Loading: " + count + " puppets");
+         for (int i = 0; i < count; i++)
+         {
+             string name = PlayerPrefs.GetString(SaveNames + i);
+             CreateNewProfile(name, false);
+         }
+
+         print("Loading ended. Puppet profiles loaded: " + m_PuppetProfiles.Count );
+    }
+
+    void OnApplicationQuit()
+    {
+        SaveProfiles();
     }
 
     public void SetSelectedBodyPart( BodyPart part )
     {
         m_SelectedBodyPart = part;
+        m_GUI.UpdateSelectedLimb();
         print("Part selected: " + m_SelectedBodyPart.name);
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if( Input.GetKeyDown( KeyCode.A))
+        if( Input.GetKeyDown( KeyCode.D))
         {
-            if (m_SelectedBodyPart != null )
-                m_Puppets[0].NextPart(m_SelectedBodyPart);
+            SaveCurrentProfile();
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            m_Puppets[0].SaveProfile();
+            SaveProfiles();
+        }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            CreateNewProfile( "Test" + m_PuppetProfiles.Count, true);
         }
 	}
 
@@ -158,13 +236,7 @@ public class KinectPuppet_Manager : MonoBehaviour
         }
     }
     */
-
-    void ChanegSelectedBodyPart()
-    {
-
-    }
-
-
+    
     BodyPart[] GetBodyParts( BodyPartType type )
     {
         for (int i = 0; i < m_BodyParts.Length; i++)
